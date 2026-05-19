@@ -1,3 +1,4 @@
+// EquipmentMapper.java
 package com.lab.equipment_booking.mapper;
 
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
