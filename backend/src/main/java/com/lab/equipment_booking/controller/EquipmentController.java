@@ -1,14 +1,13 @@
 package com.lab.equipment_booking.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.lab.equipment_booking.common.Result;
 import com.lab.equipment_booking.dto.EquipmentQueryDTO;
 import com.lab.equipment_booking.entity.Equipment;
 import com.lab.equipment_booking.service.EquipmentService;
+import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/equipment")
@@ -19,34 +18,25 @@ public class EquipmentController {
     private EquipmentService equipmentService;
 
     @GetMapping("/list")
-    public Page<Equipment> list(EquipmentQueryDTO queryDTO) {
-        return equipmentService.pageQuery(queryDTO);
+    public Result<Page<Equipment>> list(@Valid EquipmentQueryDTO queryDTO) {
+        return Result.success(equipmentService.pageQuery(queryDTO));
     }
 
     @PostMapping("/add")
-    public Map<String, Object> add(@RequestBody Equipment equipment) {
+    public Result<Void> add(@Valid @RequestBody Equipment equipment) {
         boolean success = equipmentService.addEquipment(equipment);
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", success);
-        result.put("message", success ? "添加成功" : "添加失败");
-        return result;
+        return success ? Result.success("添加成功", null) : Result.error("添加失败");
     }
 
     @PutMapping("/update")
-    public Map<String, Object> update(@RequestBody Equipment equipment) {
+    public Result<Void> update(@Valid @RequestBody Equipment equipment) {
         boolean success = equipmentService.updateEquipment(equipment);
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", success);
-        result.put("message", success ? "更新成功" : "更新失败");
-        return result;
+        return success ? Result.success("更新成功", null) : Result.error("更新失败");
     }
 
     @DeleteMapping("/delete/{id}")
-    public Map<String, Object> delete(@PathVariable Long id) {
+    public Result<Void> delete(@PathVariable Long id) {
         boolean success = equipmentService.deleteEquipment(id);
-        Map<String, Object> result = new HashMap<>();
-        result.put("success", success);
-        result.put("message", success ? "删除成功" : "删除失败");
-        return result;
+        return success ? Result.success("删除成功", null) : Result.error("删除失败");
     }
 }
