@@ -31,6 +31,7 @@
     <el-card class="table-card">
       <el-table :data="equipmentList" v-loading="loading" stripe>
         <el-table-column prop="name" label="设备名称" min-width="150" />
+        <el-table-column prop="model" label="型号" width="120" />
         <el-table-column prop="category" label="类别" width="100" />
         <el-table-column prop="location" label="位置" width="150" />
         <el-table-column prop="status" label="状态" width="100">
@@ -91,15 +92,30 @@ const loadEquipments = async () => {
   try {
     const res = await request.get('/equipment/list', {
       params: {
-        page: page.value,
-        size: size.value,
+        pageNum: page.value,
+        pageSize: size.value,
         name: filters.name || undefined,
         category: filters.category || undefined,
         status: filters.status !== '' ? filters.status : undefined
       }
     })
-    equipmentList.value = res.records || []
-    total.value = res.total || 0
+    // 适配后端返回格式
+    if (res.code === 200 || res.code === '200') {
+      const data = res.data
+      if (data && data.records) {
+        equipmentList.value = data.records
+        total.value = data.total
+      } else if (Array.isArray(data)) {
+        equipmentList.value = data
+        total.value = data.length
+      } else {
+        equipmentList.value = []
+        total.value = 0
+      }
+    } else {
+      equipmentList.value = []
+      total.value = 0
+    }
   } catch (error) {
     console.error('加载设备列表失败', error)
     ElMessage.error('加载设备列表失败')

@@ -3,7 +3,7 @@
     <el-menu mode="horizontal" router>
       <el-menu-item index="/student/equipment">设备列表</el-menu-item>
       <el-menu-item index="/student/my-bookings">我的预约</el-menu-item>
-      <el-menu-item @click="logout" style="float: right">退出登录</el-menu-item>
+      <el-menu-item index="logout" @click="logout" style="float: right">退出登录</el-menu-item>
     </el-menu>
     <div style="padding: 20px">
       <router-view />

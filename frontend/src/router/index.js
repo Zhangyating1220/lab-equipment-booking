@@ -35,30 +35,28 @@ const router = createRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
+// 路由守卫：检查登录状态和角色权限
+router.beforeEach((to, from) => {
   const token = localStorage.getItem('token')
   const role = localStorage.getItem('role')
 
+  // 登录页直接放行
   if (to.path === '/login') {
-    next()
-    return
+    return true
   }
 
+  // 未登录：跳转到登录页
   if (!token) {
-    next('/login')
-    return
+    return '/login'
   }
 
+  // 检查角色权限（防止学生访问管理员页面）
   if (to.meta.role !== undefined && Number(to.meta.role) !== Number(role)) {
-    if (Number(role) === 0) {
-      next('/student')
-    } else {
-      next('/admin')
-    }
-    return
+    // 角色不匹配，跳转到对应角色首页
+    return Number(role) === 0 ? '/student' : '/admin'
   }
 
-  next()
+  return true
 })
 
 export default router
