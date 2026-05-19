@@ -19,7 +19,7 @@
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
 import { ElMessage } from 'element-plus'
-import request from '../utils/request'
+import request from '@/utils/request'
 
 const router = useRouter()
 const form = reactive({
@@ -35,17 +35,24 @@ const handleLogin = async () => {
   try {
     const res = await request.post('/api/user/login', form)
     if (res.code === 200) {
+      // 存储 token 和用户信息
       localStorage.setItem('token', res.token)
       localStorage.setItem('role', res.role)
       localStorage.setItem('name', res.name)
+      localStorage.setItem('user', JSON.stringify({
+        id: res.userId,
+        name: res.name,
+        role: res.role
+      }))
       ElMessage.success('登录成功')
+      // 根据角色跳转到不同页面
       if (res.role === 0) {
         router.push('/student')
       } else {
         router.push('/admin')
       }
     } else {
-      ElMessage.error(res.message)
+      ElMessage.error(res.message || '登录失败')
     }
   } catch (error) {
     console.error('登录失败', error)
