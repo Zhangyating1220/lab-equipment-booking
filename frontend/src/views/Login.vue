@@ -33,7 +33,7 @@ const handleLogin = async () => {
     return
   }
   try {
-    const res = await request.post('/api/user/login', form)
+    const res = await request.post('/user/login', form)
     if (res.code === 200) {
       // 存储 token 和用户信息
       localStorage.setItem('token', res.token)

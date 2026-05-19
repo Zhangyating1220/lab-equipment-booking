@@ -1,31 +1,33 @@
 <template>
-  <div>
-    <h2>我的预约</h2>
-    <el-table :data="bookings" style="width:100%" v-loading="loading">
-      <el-table-column prop="equipmentName" label="设备名称" />
-      <el-table-column prop="startTime" label="开始时间" width="180" />
-      <el-table-column prop="endTime" label="结束时间" width="180" />
-      <el-table-column label="状态" width="100">
-        <template #default="{ row }">
-          <el-tag :type="getStatusType(row.status)">
-            {{ getStatusText(row.status) }}
-          </el-tag>
-        </template>
-      </el-table-column>
-      <el-table-column prop="reason" label="拒绝原因" />
-      <el-table-column label="操作" width="120">
-        <template #default="{ row }">
-          <el-button 
-            v-if="row.status === 0"
-            type="danger" 
-            size="small" 
-            @click="cancelBooking(row.id)"
-          >
-            取消
-          </el-button>
-        </template>
-      </el-table-column>
-    </el-table>
+  <div class="my-bookings">
+    <el-card>
+      <template #header>
+        <div class="card-header">
+          <span>我的预约</span>
+          <el-button type="primary" size="small" @click="loadBookings" :loading="loading">刷新</el-button>
+        </div>
+      </template>
+
+      <el-table :data="bookings" v-loading="loading" stripe>
+        <el-table-column prop="equipmentName" label="设备名称" min-width="150" />
+        <el-table-column prop="startTime" label="开始时间" width="180" />
+        <el-table-column prop="endTime" label="结束时间" width="180" />
+        <el-table-column label="状态" width="100">
+          <template #default="{ row }">
+            <el-tag :type="getStatusType(row.status)">{{ getStatusText(row.status) }}</el-tag>
+          </template>
+        </el-table-column>
+        <el-table-column prop="reason" label="事由/拒绝原因" min-width="150" />
+        <el-table-column label="操作" width="100">
+          <template #default="{ row }">
+            <el-button v-if="row.status === 0" type="danger" size="small" @click="cancelBooking(row.id)">取消</el-button>
+            <span v-else>--</span>
+          </template>
+        </el-table-column>
+      </el-table>
+
+      <el-empty v-if="!loading && bookings.length === 0" description="暂无预约记录" />
+    </el-card>
   </div>
 </template>
 
@@ -49,7 +51,10 @@ const getStatusType = (status) => {
 
 const loadBookings = async () => {
   const userStr = localStorage.getItem('user')
-  if (!userStr) return
+  if (!userStr) {
+    ElMessage.warning('请先登录')
+    return
+  }
   const user = JSON.parse(userStr)
   loading.value = true
   try {
@@ -57,7 +62,7 @@ const loadBookings = async () => {
     bookings.value = res || []
   } catch (error) {
     console.error('加载预约列表失败', error)
-    ElMessage.error('加载失败')
+    ElMessage.error('加载预约列表失败')
   } finally {
     loading.value = false
   }
@@ -73,7 +78,7 @@ const cancelBooking = async (id) => {
       ElMessage.success('取消成功')
       loadBookings()
     } else {
-      ElMessage.error(res.message)
+      ElMessage.error(res.message || '取消失败')
     }
   } catch (error) {
     if (error !== 'cancel') {
@@ -86,3 +91,14 @@ onMounted(() => {
   loadBookings()
 })
 </script>
+
+<style scoped>
+.my-bookings {
+  padding: 20px;
+}
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+</style>

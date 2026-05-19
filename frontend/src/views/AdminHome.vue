@@ -4,7 +4,7 @@
     <el-menu mode="horizontal" router>
       <el-menu-item index="/admin/approvals">审批列表</el-menu-item>
       <el-menu-item index="/admin/equipment">设备管理</el-menu-item>
-      <el-menu-item @click="logout" style="float: right">退出登录</el-menu-item>
+      <el-menu-item index="logout" @click="logout" style="float: right">退出登录</el-menu-item>
     </el-menu>
 
     <!-- 子路由内容区域 -->

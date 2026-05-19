@@ -6,11 +6,8 @@ import EquipmentList from '../views/EquipmentList.vue'
 import MyBookings from '../views/MyBookings.vue'
 
 const routes = [
-  // 登录页
   { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
-
-  // 学生端（角色 0）
   {
     path: '/student',
     component: StudentHome,
@@ -21,8 +18,6 @@ const routes = [
       { path: 'my-bookings', component: MyBookings }
     ]
   },
-
-  // 管理员端（角色 1）
   {
     path: '/admin',
     component: AdminHome,
@@ -41,34 +36,27 @@ const router = createRouter({
 })
 
 // 路由守卫：检查登录状态和角色权限
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, from) => {
   const token = localStorage.getItem('token')
   const role = localStorage.getItem('role')
 
   // 登录页直接放行
   if (to.path === '/login') {
-    next()
-    return
+    return true
   }
 
   // 未登录：跳转到登录页
   if (!token) {
-    next('/login')
-    return
+    return '/login'
   }
 
   // 检查角色权限（防止学生访问管理员页面）
   if (to.meta.role !== undefined && Number(to.meta.role) !== Number(role)) {
     // 角色不匹配，跳转到对应角色首页
-    if (Number(role) === 0) {
-      next('/student')
-    } else {
-      next('/admin')
-    }
-    return
+    return Number(role) === 0 ? '/student' : '/admin'
   }
 
-  next()
+  return true
 })
 
 export default router
