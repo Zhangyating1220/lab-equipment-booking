@@ -10,3 +10,14 @@ CREATE TABLE `user` (
   `phone` varchar(16),
   `create_time` datetime DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE `equipment` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `name` VARCHAR(64) NOT NULL,
+  `category` VARCHAR(32) NOT NULL,
+  `model` VARCHAR(64),
+  `location` VARCHAR(128),
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '0-可用,1-维修中,2-已废弃',
+  `description` VARCHAR(256),
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
+);
