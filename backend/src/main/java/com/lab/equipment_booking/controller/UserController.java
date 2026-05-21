@@ -38,6 +38,7 @@ public class UserController {
             result.put("code", 200);
             result.put("message", "登录成功");
             result.put("token", token);
+            result.put("userId", user.getId());   // 新增
             result.put("role", user.getRole());
             result.put("name", user.getName());
             result.put("userId", user.getId());
