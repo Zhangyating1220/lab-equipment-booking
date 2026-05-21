@@ -134,7 +134,7 @@ const onDateChange = async () => {
         date: form.date 
       }
     })
-    availableSlots.value = res || []
+    availableSlots.value = res.data || []
   } catch (error) {
     console.error('获取时段失败', error)
     ElMessage.error('获取可用时段失败')
@@ -156,7 +156,12 @@ const submitBooking = async () => {
     return
   }
   const user = JSON.parse(userStr)
-  const userId = user.id
+  const userId = user.id || user.userId
+  
+  if (!userId) {
+    ElMessage.warning('无法获取用户信息')
+    return
+  }
   
   const [startHour, endHour] = form.slot.split('-')
   const startTime = `${form.date} ${startHour}:00`
@@ -172,7 +177,7 @@ const submitBooking = async () => {
       reason: form.reason || ''
     })
     
-    if (res.success) {
+    if (res.code === 200) {
       ElMessage.success('预约成功，等待管理员审批')
       visible.value = false
       emit('success')

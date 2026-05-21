@@ -40,6 +40,7 @@ public class UserController {
             result.put("token", token);
             result.put("role", user.getRole());
             result.put("name", user.getName());
+            result.put("userId", user.getId());
         }
         return result;
     }

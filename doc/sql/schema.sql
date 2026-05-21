@@ -21,3 +21,18 @@ CREATE TABLE `equipment` (
   `description` VARCHAR(256),
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+-- 预约表
+CREATE TABLE `booking` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `equipment_id` BIGINT NOT NULL,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NOT NULL,
+  `reason` VARCHAR(256),
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '0-待审批,1-已通过,2-已拒绝,3-已取消',
+  `reject_reason` VARCHAR(256),
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`equipment_id`) REFERENCES `equipment`(`id`)
+);

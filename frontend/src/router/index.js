@@ -4,6 +4,7 @@ import StudentHome from '../views/StudentHome.vue'
 import AdminHome from '../views/AdminHome.vue'
 import EquipmentList from '../views/EquipmentList.vue'
 import MyBookings from '../views/MyBookings.vue'
+import ApprovalList from '../views/ApprovalList.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
@@ -19,15 +20,15 @@ const routes = [
     ]
   },
   {
-    path: '/admin',
-    component: AdminHome,
-    meta: { requiresAuth: true, role: 1 },
-    children: [
-      { path: '', redirect: '/admin/approvals' },
-      { path: 'approvals', component: { template: '<div>审批列表页面（待开发）</div>' } },
-      { path: 'equipment', component: { template: '<div>设备管理页面（待开发）</div>' } }
-    ]
-  }
+  path: '/admin',
+  component: AdminHome,
+  meta: { requiresAuth: true, role: 1 },
+  children: [
+    { path: '', redirect: '/admin/approvals' },
+    { path: 'approvals', component: ApprovalList },  // 修改这一行
+    { path: 'equipment', component: { template: '<div>设备管理页面（待开发）</div>' } }
+  ]
+}
 ]
 
 const router = createRouter({
