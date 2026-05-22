@@ -4,9 +4,13 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lab.equipment_booking.entity.Equipment;
 import com.lab.equipment_booking.entity.Reservation;
+import com.lab.equipment_booking.entity.User;
+import com.lab.equipment_booking.entity.UsageRecord;
 import com.lab.equipment_booking.mapper.EquipmentMapper;
 import com.lab.equipment_booking.mapper.ReservationMapper;
+import com.lab.equipment_booking.mapper.UserMapper;
 import com.lab.equipment_booking.service.ReservationService;
+import com.lab.equipment_booking.service.UsageRecordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +31,12 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
 
     @Autowired
     private EquipmentMapper equipmentMapper;
+
+    @Autowired
+    private UserMapper userMapper;
+
+    @Autowired
+    private UsageRecordService usageRecordService;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -165,7 +175,28 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
         }
         reservation.setStatus(1);
         reservation.setUpdateTime(LocalDateTime.now());
-        return reservationMapper.updateById(reservation) > 0;
+        
+        boolean success = reservationMapper.updateById(reservation) > 0;
+        
+        if (success) {
+            Equipment equipment = equipmentMapper.selectById(reservation.getEquipmentId());
+            User user = userMapper.selectById(reservation.getUserId());
+            
+            UsageRecord record = new UsageRecord();
+            record.setReservationId(reservation.getId());
+            record.setEquipmentId(reservation.getEquipmentId());
+            record.setEquipmentName(equipment != null ? equipment.getName() : "");
+            record.setUserId(reservation.getUserId());
+            record.setUserName(user != null ? user.getName() : "");
+            record.setStartTime(reservation.getStartTime());
+            record.setEndTime(reservation.getEndTime());
+            record.setStatus(0);
+            
+            usageRecordService.createRecord(record);
+            logger.info("审批通过，已创建使用记录: reservationId={}", id);
+        }
+        
+        return success;
     }
 
     @Override
@@ -207,6 +238,16 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
             map.put("equipmentName", equipment.getName());
             map.put("equipmentModel", equipment.getModel());
             map.put("equipmentLocation", equipment.getLocation());
+        }
+
+        // 加载用户信息
+        User user = userMapper.selectById(reservation.getUserId());
+        if (user != null) {
+            map.put("userName", user.getName() != null ? user.getName() : user.getUsername());
+            logger.info("查询到用户: userId={}, name={}, username={}", reservation.getUserId(), user.getName(), user.getUsername());
+        } else {
+            map.put("userName", "未知用户");
+            logger.warn("未找到用户: userId={}", reservation.getUserId());
         }
 
         map.put("startTime", reservation.getStartTime());

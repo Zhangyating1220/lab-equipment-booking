@@ -2,6 +2,8 @@ package com.lab.equipment_booking.controller;
 
 import com.lab.equipment_booking.common.Result;
 import com.lab.equipment_booking.entity.Reservation;
+import com.lab.equipment_booking.entity.User;
+import com.lab.equipment_booking.mapper.UserMapper;
 import com.lab.equipment_booking.service.ReservationService;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,12 +28,28 @@ public class ReservationController {
 
     @Autowired
     private ReservationService reservationService;
+    
+    @Autowired
+    private UserMapper userMapper;
 
     /**
      * 创建预约（包含冲突校验）
      */
     @PostMapping("/create")
     public Result<Map<String, Object>> create(@Valid @RequestBody Reservation reservation) {
+        // 检查用户是否存在
+        Long userId = reservation.getUserId();
+        User user = userMapper.selectById(userId);
+        if (user == null) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("success", false);
+            data.put("message", "用户不存在");
+            return Result.success(data);
+        }
+        
+        // 使用数据库中的真实用户 ID
+        reservation.setUserId(user.getId());
+        
         int result = reservationService.createReservation(reservation);
         Map<String, Object> data = new HashMap<>();
         if (result == 0) {
@@ -89,30 +107,40 @@ public class ReservationController {
         return Result.success(reservationService.getPendingReservations());
     }
 
-    /**
-     * 审批通过预约
-     */
-    @PutMapping("/approve/{id}")
-    public Result<Void> approve(@PathVariable Long id) {
-        boolean success = reservationService.approveReservation(id);
-        return success ? Result.success("审批通过", null) : Result.error("审批失败");
+    // 修改审批通过接口
+@PutMapping("/approve/{id}")
+public Result<Void> approve(@PathVariable Long id) {
+    boolean success = reservationService.approveReservation(id);
+    if (success) {
+        return Result.success("审批通过", null);
+    } else {
+        return Result.error("审批失败：预约不存在或状态不是待审批"); // ✅ 增强错误提示
     }
+}
 
-    /**
-     * 拒绝预约（需填写原因）
-     */
-    @PutMapping("/reject/{id}")
-    public Result<Void> reject(@PathVariable Long id, @RequestParam String reason) {
-        boolean success = reservationService.rejectReservation(id, reason);
-        return success ? Result.success("已拒绝", null) : Result.error("操作失败");
+// 修改拒绝预约接口
+@PutMapping("/reject/{id}")
+public Result<Void> reject(@PathVariable Long id, @RequestBody Map<String, String> request) {
+    String reason = request.get("reason");
+    if (reason == null || reason.trim().isEmpty()) {
+        return Result.error("拒绝原因不能为空"); // ✅ 增强错误提示
     }
+    boolean success = reservationService.rejectReservation(id, reason.trim());
+    if (success) {
+        return Result.success("已拒绝", null);
+    } else {
+        return Result.error("拒绝失败：预约不存在或状态不是待审批"); // ✅ 增强错误提示
+    }
+}
 
-    /**
-     * 取消预约
-     */
-    @PutMapping("/cancel/{id}")
-    public Result<Void> cancel(@PathVariable Long id) {
-        boolean success = reservationService.cancelReservation(id);
-        return success ? Result.success("已取消", null) : Result.error("操作失败");
+// 修改取消预约接口
+@PutMapping("/cancel/{id}")
+public Result<Void> cancel(@PathVariable Long id) {
+    boolean success = reservationService.cancelReservation(id);
+    if (success) {
+        return Result.success("已取消", null);
+    } else {
+        return Result.error("取消失败：预约不存在或状态不允许取消"); // ✅ 增强错误提示
     }
+}
 }
