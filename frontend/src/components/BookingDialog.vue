@@ -169,7 +169,7 @@ const submitBooking = async () => {
       equipmentId: props.equipment.id,
       startTime,
       endTime,
-      reason: form.reason || ''
+      purpose: form.reason || ''
     })
     
     if (res.success) {
