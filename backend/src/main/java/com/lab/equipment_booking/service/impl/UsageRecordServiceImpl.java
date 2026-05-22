@@ -62,7 +62,7 @@ public class UsageRecordServiceImpl implements UsageRecordService {
     }
 
     @Override
-    public List<UsageRecord> findByUserId(Long userId) {
+    public List<UsageRecord> findByUserId(String userId) {
         try {
             return usageRecordMapper.findByUserId(userId);
         } catch (Exception e) {

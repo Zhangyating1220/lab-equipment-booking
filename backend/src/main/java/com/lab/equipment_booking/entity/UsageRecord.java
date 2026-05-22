@@ -14,7 +14,7 @@ public class UsageRecord {
     private Long reservationId;
     private Long equipmentId;
     private String equipmentName;
-    private Long userId;
+    private String userId;
     private String userName;
     private LocalDateTime startTime;
     private LocalDateTime endTime;

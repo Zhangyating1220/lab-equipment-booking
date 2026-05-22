@@ -12,8 +12,8 @@ import java.util.Map;
 @Mapper
 public interface UsageRecordMapper extends BaseMapper<UsageRecord> {
     
-    @Select("SELECT * FROM usage_record WHERE user_id = #{userId} ORDER BY start_time DESC")
-    List<UsageRecord> findByUserId(Long userId);
+    @Select("SELECT * FROM usage_record WHERE CAST(user_id AS CHAR) = #{userId} ORDER BY start_time DESC")
+    List<UsageRecord> findByUserId(String userId);
     
     @Select("SELECT * FROM usage_record WHERE equipment_id = #{equipmentId} ORDER BY start_time DESC")
     List<UsageRecord> findByEquipmentId(Long equipmentId);
