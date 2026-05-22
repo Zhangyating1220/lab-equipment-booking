@@ -4,8 +4,10 @@ import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lab.equipment_booking.entity.Equipment;
 import com.lab.equipment_booking.entity.Reservation;
+import com.lab.equipment_booking.entity.User;
 import com.lab.equipment_booking.mapper.EquipmentMapper;
 import com.lab.equipment_booking.mapper.ReservationMapper;
+import com.lab.equipment_booking.mapper.UserMapper;
 import com.lab.equipment_booking.service.ReservationService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,6 +29,9 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
 
     @Autowired
     private EquipmentMapper equipmentMapper;
+
+    @Autowired
+    private UserMapper userMapper;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -111,7 +116,7 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
     }
 
     @Override
-    public List<Map<String, Object>> getUserReservations(Long userId) {
+    public List<Map<String, Object>> getUserReservations(String userId) {
         List<Reservation> reservations = reservationMapper.findByUserId(userId);
         return reservations.stream().map(this::convertToMap).collect(Collectors.toList());
     }
@@ -201,6 +206,23 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
         map.put("id", reservation.getId());
         map.put("userId", reservation.getUserId());
         map.put("equipmentId", reservation.getEquipmentId());
+
+        // 获取用户名
+        try {
+            Long userId = Long.parseLong(reservation.getUserId());
+            User user = userMapper.selectById(userId);
+            if (user != null) {
+                map.put("userName", user.getName());
+                map.put("userUsername", user.getUsername());
+            } else {
+                map.put("userName", "未知用户");
+                map.put("userUsername", "未知用户");
+            }
+        } catch (NumberFormatException e) {
+            logger.warn("用户ID格式错误: {}", reservation.getUserId());
+            map.put("userName", "未知用户");
+            map.put("userUsername", "未知用户");
+        }
 
         Equipment equipment = equipmentMapper.selectById(reservation.getEquipmentId());
         if (equipment != null) {

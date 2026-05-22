@@ -1,13 +1,18 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import Login from '../views/Login.vue'
+import Register from '../views/Register.vue'
 import StudentHome from '../views/StudentHome.vue'
 import AdminHome from '../views/AdminHome.vue'
 import EquipmentList from '../views/EquipmentList.vue'
 import MyBookings from '../views/MyBookings.vue'
+import AdminApprovals from '../views/AdminApprovals.vue'
+import AdminEquipment from '../views/AdminEquipment.vue'
+import UsageRecords from '../views/UsageRecords.vue'
 
 const routes = [
   { path: '/', redirect: '/login' },
   { path: '/login', component: Login },
+  { path: '/register', component: Register },
   {
     path: '/student',
     component: StudentHome,
@@ -24,8 +29,9 @@ const routes = [
     meta: { requiresAuth: true, role: 1 },
     children: [
       { path: '', redirect: '/admin/approvals' },
-      { path: 'approvals', component: { template: '<div>审批列表页面（待开发）</div>' } },
-      { path: 'equipment', component: { template: '<div>设备管理页面（待开发）</div>' } }
+      { path: 'approvals', component: AdminApprovals },
+      { path: 'equipment', component: AdminEquipment },
+      { path: 'usage', component: UsageRecords }
     ]
   }
 ]
@@ -40,8 +46,8 @@ router.beforeEach((to, from) => {
   const token = localStorage.getItem('token')
   const role = localStorage.getItem('role')
 
-  // 登录页直接放行
-  if (to.path === '/login') {
+  // 登录页和注册页直接放行
+  if (to.path === '/login' || to.path === '/register') {
     return true
   }
 
