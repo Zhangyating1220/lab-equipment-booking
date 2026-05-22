@@ -3,6 +3,8 @@ package com.lab.equipment_booking.controller;
 import com.lab.equipment_booking.common.Result;
 import com.lab.equipment_booking.entity.UsageRecord;
 import com.lab.equipment_booking.service.UsageRecordService;
+import com.lab.equipment_booking.utils.JwtUtil;
+import io.jsonwebtoken.Claims;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
@@ -11,15 +13,22 @@ import java.util.List;
 import java.util.Map;
 
 @RestController
-@RequestMapping("/api/usage")
+@RequestMapping({"/api/usage-record", "/api/usage"})
 @CrossOrigin
 public class UsageRecordController {
     
     @Autowired
     private UsageRecordService usageRecordService;
+    
+    @Autowired
+    private JwtUtil jwtUtil;
 
     @GetMapping("/list")
-    public Result<List<Map<String, Object>>> list() {
+    public Result<List<Map<String, Object>>> list(
+            @RequestHeader(value = "Authorization", required = false) String token) {
+        if (!checkAdminPermission(token)) {
+            return Result.error("无权限访问");
+        }
         return Result.success(usageRecordService.findAllWithDetail());
     }
 
@@ -81,5 +90,18 @@ public class UsageRecordController {
         summary.put("equipmentStats", usageRecordService.getEquipmentStats());
         summary.put("userStats", usageRecordService.getUserStats());
         return Result.success(summary);
+    }
+    
+    private boolean checkAdminPermission(String token) {
+        try {
+            if (token != null && token.startsWith("Bearer ")) {
+                token = token.substring(7);
+            }
+            Claims claims = jwtUtil.parseToken(token);
+            Integer role = claims.get("role", Integer.class);
+            return role != null && role == 1;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
