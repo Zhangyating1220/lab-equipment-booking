@@ -10,6 +10,7 @@
           <el-input type="password" v-model="form.password" placeholder="请输入密码" />
         </el-form-item>
         <el-button type="primary" @click="handleLogin">登录</el-button>
+        <el-button @click="goToRegister">注册</el-button>
       </el-form>
     </el-card>
   </div>
@@ -58,6 +59,10 @@ const handleLogin = async () => {
     console.error('登录失败', error)
     ElMessage.error('登录失败，请稍后再试')
   }
+}
+
+const goToRegister = () => {
+  router.push('/register')
 }
 </script>
 
