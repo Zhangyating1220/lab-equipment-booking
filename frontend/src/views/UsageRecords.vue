@@ -127,7 +127,7 @@ const equipmentCount = computed(() => {
 })
 
 const userCount = computed(() => {
-  return new Set(records.value.map(r => r.user_id)).size
+  return userStats.value.length
 })
 
 const getStatusText = (status) => {
@@ -160,9 +160,9 @@ const loadRecords = async () => {
   loading.value = true
   try {
     const res = await request.get('/usage/list')
-    // ❌ 错误：响应拦截器已提取 data，不应该检查 res.code
-    if (res.code === 200) {
-      records.value = res.data
+    // 响应拦截器已提取 data，直接使用即可
+    if (Array.isArray(res)) {
+      records.value = res
     }
   } catch (error) {
     console.error('加载使用记录失败', error)
