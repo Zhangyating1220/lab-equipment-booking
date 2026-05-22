@@ -21,3 +21,16 @@ CREATE TABLE `equipment` (
   `description` VARCHAR(256),
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE TABLE `reservation` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `equipment_id` BIGINT NOT NULL,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NOT NULL,
+  `purpose` VARCHAR(256),
+  `status` TINYINT NOT NULL DEFAULT 0,
+  `reject_reason` VARCHAR(256),
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+);

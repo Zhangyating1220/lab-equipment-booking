@@ -172,12 +172,13 @@ const submitBooking = async () => {
       purpose: form.reason || ''
     })
     
-    if (res.success) {
+    const data = res.data || res
+    if (data.success) {
       ElMessage.success('预约成功，等待管理员审批')
       visible.value = false
       emit('success')
     } else {
-      ElMessage.error(res.message || '预约失败')
+      ElMessage.error(data.message || '预约失败')
     }
   } catch (error) {
     console.error('预约失败', error)
