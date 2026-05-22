@@ -2,7 +2,7 @@ import axios from 'axios'
 import { ElMessage } from 'element-plus'
 
 const request = axios.create({
-  baseURL: 'http://localhost:8080/api',
+  baseURL: '/api',
   timeout: 10000
 })
 
@@ -17,7 +17,14 @@ request.interceptors.request.use(config => {
 })
 
 request.interceptors.response.use(
-  response => response.data,
+  response => {
+    const data = response.data
+    // 如果后端返回的是 Result 对象，提取 data 字段
+    if (data && typeof data === 'object' && 'data' in data) {
+      return data.data
+    }
+    return data
+  },
   error => {
     if (error.response) {
       ElMessage.error(error.response.data?.message || '请求失败')

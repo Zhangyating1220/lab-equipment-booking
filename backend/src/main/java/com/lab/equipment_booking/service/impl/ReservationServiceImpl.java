@@ -116,7 +116,7 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
     }
 
     @Override
-    public List<Map<String, Object>> getUserReservations(String userId) {
+    public List<Map<String, Object>> getUserReservations(Long userId) {
         List<Reservation> reservations = reservationMapper.findByUserId(userId);
         return reservations.stream().map(this::convertToMap).collect(Collectors.toList());
     }
@@ -208,8 +208,8 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
         map.put("equipmentId", reservation.getEquipmentId());
 
         // 获取用户名
-        try {
-            Long userId = Long.parseLong(reservation.getUserId());
+        Long userId = reservation.getUserId();
+        if (userId != null) {
             User user = userMapper.selectById(userId);
             if (user != null) {
                 map.put("userName", user.getName());
@@ -218,8 +218,7 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
                 map.put("userName", "未知用户");
                 map.put("userUsername", "未知用户");
             }
-        } catch (NumberFormatException e) {
-            logger.warn("用户ID格式错误: {}", reservation.getUserId());
+        } else {
             map.put("userName", "未知用户");
             map.put("userUsername", "未知用户");
         }

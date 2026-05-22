@@ -17,7 +17,7 @@ public class Reservation {
     
     @TableField("user_id")
     @JsonProperty("userId")
-    private String userId;  // 使用 String 类型，避免 JS 精度丢失
+    private Long userId;
     
     @TableField("equipment_id")
     @JsonProperty("equipmentId")

@@ -3,11 +3,18 @@ package com.lab.equipment_booking.utils;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 public class BCryptUtil {
-    private static final BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+    private static BCryptPasswordEncoder encoder;
+
+    public static void setEncoder(BCryptPasswordEncoder encoder) {
+        BCryptUtil.encoder = encoder;
+    }
 
     public static String encode(String raw) {
         if (raw == null || raw.isEmpty()) {
             throw new IllegalArgumentException("密码不能为空");
+        }
+        if (encoder == null) {
+            encoder = new BCryptPasswordEncoder();
         }
         return encoder.encode(raw);
     }
@@ -18,6 +25,9 @@ public class BCryptUtil {
         }
         if (encoded == null || encoded.isEmpty()) {
             throw new IllegalArgumentException("加密密码不能为空");
+        }
+        if (encoder == null) {
+            encoder = new BCryptPasswordEncoder();
         }
         return encoder.matches(raw, encoded);
     }

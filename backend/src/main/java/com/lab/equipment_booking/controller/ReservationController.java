@@ -5,6 +5,7 @@ import com.lab.equipment_booking.entity.Reservation;
 import com.lab.equipment_booking.service.ReservationService;
 import com.lab.equipment_booking.utils.JwtUtil;
 import io.jsonwebtoken.Claims;
+import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -37,7 +38,38 @@ public class ReservationController {
      * 创建预约（包含冲突校验，兼容 /booking/submit 路径）
      */
     @PostMapping({"/create", "/booking/submit"})
-    public Result<Map<String, Object>> create(@Valid @RequestBody Reservation reservation) {
+    public Result<Map<String, Object>> create(@Valid @RequestBody Reservation reservation, HttpServletRequest httpRequest) {
+        // 从请求头中获取 token
+        String authHeader = httpRequest.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("success", false);
+            data.put("message", "未登录或 token 无效");
+            return Result.success(data);
+        }
+        
+        String token = authHeader.substring(7);
+        Long userId = null;
+        try {
+            Claims claims = jwtUtil.parseToken(token);
+            userId = claims.get("userId", Long.class);
+        } catch (Exception e) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("success", false);
+            data.put("message", "token 解析失败: " + e.getMessage());
+            return Result.success(data);
+        }
+        
+        if (userId == null) {
+            Map<String, Object> data = new HashMap<>();
+            data.put("success", false);
+            data.put("message", "无法获取用户信息");
+            return Result.success(data);
+        }
+        
+        // 设置从 token 解析出的用户ID
+        reservation.setUserId(userId);
+        
         int result = reservationService.createReservation(reservation);
         Map<String, Object> data = new HashMap<>();
         if (result == 0) {
@@ -83,7 +115,7 @@ public class ReservationController {
      * 获取用户预约列表
      */
     @GetMapping("/user/{userId}")
-    public Result<List<Map<String, Object>>> getUserReservations(@PathVariable String userId) {
+    public Result<List<Map<String, Object>>> getUserReservations(@PathVariable Long userId) {
         return Result.success(reservationService.getUserReservations(userId));
     }
 

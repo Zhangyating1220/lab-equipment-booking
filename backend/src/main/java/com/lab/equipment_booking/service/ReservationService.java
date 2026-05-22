@@ -21,7 +21,7 @@ public interface ReservationService extends IService<Reservation> {
     /**
      * 获取用户的预约列表（包含设备信息）
      */
-    List<Map<String, Object>> getUserReservations(String userId);
+    List<Map<String, Object>> getUserReservations(Long userId);
 
     /**
      * 获取待审批的预约列表（包含设备信息）
