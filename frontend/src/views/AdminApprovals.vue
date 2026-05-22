@@ -60,8 +60,11 @@ const loadApprovals = async () => {
   loading.value = true
   try {
     const res = await request.get('/reservation/pending')
-    if (res.code === 200) {
-      approvals.value = res.data
+
+    if (res && res.code === 200) {
+      approvals.value = res.data || []
+    } else if (res) {
+      approvals.value = res
     }
   } catch (error) {
     console.error('加载待审批列表失败', error)
