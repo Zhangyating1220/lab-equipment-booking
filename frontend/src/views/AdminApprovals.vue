@@ -60,6 +60,7 @@ const loadApprovals = async () => {
   loading.value = true
   try {
     const res = await request.get('/reservation/pending')
+
     if (res && res.code === 200) {
       approvals.value = res.data || []
     } else if (res) {

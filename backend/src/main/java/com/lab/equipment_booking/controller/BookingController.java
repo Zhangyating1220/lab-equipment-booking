@@ -74,7 +74,7 @@ public class BookingController {
         
         // 转换为实体
         Reservation reservation = new Reservation();
-        reservation.setUserId(userId);  // 从 token 解析的 userId
+        reservation.setUserId(userId);
         reservation.setEquipmentId(request.getEquipmentId());
         reservation.setStartTime(request.getStartTime());
         reservation.setEndTime(request.getEndTime());
@@ -109,5 +109,75 @@ public class BookingController {
         data.put("hasConflict", hasConflict);
         data.put("message", hasConflict ? "该时段已被预约" : "该时段可用");
         return Result.success(data);
+    }
+
+    @GetMapping("/my")
+    public Result<List<Map<String, Object>>> getMyBookings(HttpServletRequest httpRequest, @RequestParam(required = false) String userId) {
+        String effectiveUserId = userId;
+        
+        // 如果没有提供 userId 参数，则从 token 中解析
+        if (effectiveUserId == null || effectiveUserId.isEmpty()) {
+            // 从请求头中获取 token
+            String authHeader = httpRequest.getHeader("Authorization");
+            if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+                return Result.error("未登录或 token 无效");
+            }
+            
+            String token = authHeader.substring(7);
+            Long parsedUserId = null;
+            try {
+                Claims claims = jwtUtil.parseToken(token);
+                parsedUserId = claims.get("userId", Long.class);
+            } catch (Exception e) {
+                return Result.error("token 解析失败: " + e.getMessage());
+            }
+            
+            if (parsedUserId == null) {
+                return Result.error("无法获取用户信息");
+            }
+            
+            effectiveUserId = parsedUserId.toString();
+        }
+        
+        // 将字符串 userId 转换为 Long 类型用于数据库查询
+        Long userIdLong = null;
+        try {
+            userIdLong = Long.parseLong(effectiveUserId);
+        } catch (NumberFormatException e) {
+            return Result.error("无效的用户ID: " + effectiveUserId);
+        }
+        
+        // 调用服务层获取用户预约列表
+        List<Map<String, Object>> reservations = reservationService.getUserReservations(userIdLong);
+        return Result.success(reservations);
+    }
+
+    @PostMapping("/cancel/{id}")
+    public Result<Void> cancelBooking(@PathVariable Long id, HttpServletRequest httpRequest) {
+        // 从请求头中获取 token
+        String authHeader = httpRequest.getHeader("Authorization");
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return Result.error("未登录或 token 无效");
+        }
+        
+        String token = authHeader.substring(7);
+        Long userId = null;
+        try {
+            Claims claims = jwtUtil.parseToken(token);
+            userId = claims.get("userId", Long.class);
+        } catch (Exception e) {
+            return Result.error("token 解析失败: " + e.getMessage());
+        }
+        
+        if (userId == null) {
+            return Result.error("无法获取用户信息");
+        }
+        
+        boolean success = reservationService.cancelReservation(id);
+        if (success) {
+            return Result.success("取消成功", null);
+        } else {
+            return Result.error("取消失败：预约不存在或状态不允许取消");
+        }
     }
 }

@@ -4,4 +4,6 @@ import com.lab.equipment_booking.entity.User;
 
 public interface UserService {
     User findByUsername(String username);
+    
+    boolean register(User user);
 }

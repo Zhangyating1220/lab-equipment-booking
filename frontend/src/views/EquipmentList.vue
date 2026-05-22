@@ -99,19 +99,13 @@ const loadEquipments = async () => {
         status: filters.status !== '' ? filters.status : undefined
       }
     })
-    // 适配后端返回格式
-    if (res.code === 200 || res.code === '200') {
-      const data = res.data
-      if (data && data.records) {
-        equipmentList.value = data.records
-        total.value = data.total
-      } else if (Array.isArray(data)) {
-        equipmentList.value = data
-        total.value = data.length
-      } else {
-        equipmentList.value = []
-        total.value = 0
-      }
+    // 响应拦截器已经提取了 data，直接使用即可
+    if (res && res.records) {
+      equipmentList.value = res.records
+      total.value = res.total
+    } else if (Array.isArray(res)) {
+      equipmentList.value = res
+      total.value = res.length
     } else {
       equipmentList.value = []
       total.value = 0
