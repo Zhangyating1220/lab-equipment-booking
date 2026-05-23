@@ -11,6 +11,10 @@ request.interceptors.request.use(config => {
   if (token) {
     config.headers['Authorization'] = `Bearer ${token}`
   }
+  // 添加 Cache-Control 头，强制不缓存
+  config.headers['Cache-Control'] = 'no-cache, no-store, must-revalidate'
+  config.headers['Pragma'] = 'no-cache'
+  config.headers['Expires'] = '0'
   return config
 }, error => {
   return Promise.reject(error)

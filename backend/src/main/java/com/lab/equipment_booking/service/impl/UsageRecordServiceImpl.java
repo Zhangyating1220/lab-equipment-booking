@@ -8,12 +8,14 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Map;
 
 @Service
+@Transactional
 public class UsageRecordServiceImpl implements UsageRecordService {
     private static final Logger logger = LoggerFactory.getLogger(UsageRecordServiceImpl.class);
     
@@ -62,7 +64,7 @@ public class UsageRecordServiceImpl implements UsageRecordService {
     }
 
     @Override
-    public List<UsageRecord> findByUserId(String userId) {
+    public List<UsageRecord> findByUserId(Long userId) {
         try {
             return usageRecordMapper.findByUserId(userId);
         } catch (Exception e) {
@@ -82,14 +84,14 @@ public class UsageRecordServiceImpl implements UsageRecordService {
     }
 
     @Override
-    public List<Map<String, Object>> findAllWithDetail() {
-        try {
-            return usageRecordMapper.findAllWithDetail();
-        } catch (Exception e) {
-            logger.error("查询所有使用记录失败", e);
-            throw new BusinessException(500, "查询使用记录失败: " + e.getMessage());
-        }
+public List<Map<String, Object>> findAllWithDetail() {
+    try {
+        return usageRecordMapper.findAllWithDetail();
+    } catch (Exception e) {
+        logger.error("查询所有使用记录失败", e);
+        throw new BusinessException(500, "查询使用记录失败: " + e.getMessage());
     }
+}
 
     @Override
     public Map<String, Object> getDailyStats(LocalDateTime date) {
@@ -122,23 +124,31 @@ public class UsageRecordServiceImpl implements UsageRecordService {
     }
 
     @Override
+    @Transactional
     public boolean startUsage(Long recordId) {
         try {
+            logger.info("开始使用, recordId: {}", recordId);
             UsageRecord record = usageRecordMapper.selectById(recordId);
             if (record == null) {
+                logger.warn("使用记录不存在, recordId: {}", recordId);
                 throw new BusinessException(400, "使用记录不存在");
             }
+            logger.info("当前状态: {}, userId: {}, equipmentId: {}", record.getStatus(), record.getUserId(), record.getEquipmentId());
             if (record.getStatus() != 0) {
+                logger.warn("当前状态不允许开始使用, recordId: {}, status: {}", recordId, record.getStatus());
                 throw new BusinessException(400, "当前状态不允许开始使用");
             }
             // 检查预约是否已过期
             LocalDateTime now = LocalDateTime.now();
             if (record.getEndTime() != null && record.getEndTime().isBefore(now)) {
+                logger.warn("预约已过期, recordId: {}, endTime: {}", recordId, record.getEndTime());
                 throw new BusinessException(400, "预约已过期，无法开始使用");
             }
             record.setStatus(1);
             record.setActualStartTime(now);
-            return usageRecordMapper.updateById(record) > 0;
+            int affectedRows = usageRecordMapper.updateById(record);
+            logger.info("更新结果: affectedRows={}", affectedRows);
+            return affectedRows > 0;
         } catch (BusinessException e) {
             throw e;
         } catch (Exception e) {

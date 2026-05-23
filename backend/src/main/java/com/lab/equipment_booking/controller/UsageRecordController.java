@@ -24,13 +24,9 @@ public class UsageRecordController {
     private JwtUtil jwtUtil;
 
     @GetMapping("/list")
-    public Result<List<Map<String, Object>>> list(
-            @RequestHeader(value = "Authorization", required = false) String token) {
-        if (!checkAdminPermission(token)) {
-            return Result.error("无权限访问");
-        }
-        return Result.success(usageRecordService.findAllWithDetail());
-    }
+public Result<List<Map<String, Object>>> list() {
+    return Result.success(usageRecordService.findAllWithDetail());
+}
 
     @GetMapping("/user/{userId}")
     public Result<List<UsageRecord>> getUserRecords(@PathVariable Long userId) {
@@ -61,16 +57,14 @@ public class UsageRecordController {
     }
 
     @PostMapping("/start/{id}")
-    @GetMapping("/start/{id}")
-    public Result<Void> startUsage(@PathVariable Long id) {
-        boolean success = usageRecordService.startUsage(id);
+    public Result<Void> startUsage(@PathVariable String id) {
+        boolean success = usageRecordService.startUsage(Long.parseLong(id));
         return success ? Result.success("开始使用", null) : Result.error("操作失败");
     }
 
     @PostMapping("/end/{id}")
-    @GetMapping("/end/{id}")
-    public Result<Void> endUsage(@PathVariable Long id) {
-        boolean success = usageRecordService.endUsage(id);
+    public Result<Void> endUsage(@PathVariable String id) {
+        boolean success = usageRecordService.endUsage(Long.parseLong(id));
         return success ? Result.success("使用结束", null) : Result.error("操作失败");
     }
 

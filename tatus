@@ -1,0 +1,15 @@
+[33mb148f1a[m[33m ([m[1;36mHEAD -> [m[1;32mfeature/approval-module[m[33m, [m[1;31morigin/feature/approval-module[m[33m)[m feat: 审批模块 - 后端 API
+[33ma3756ce[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m, [m[1;32mmain[m[33m)[m Merge pull request #4 from Zhangyating1220/feature/equipment-module
+[33m2a05bb2[m fix: 根据review意见修改设备列表页面（增加型号列、优化状态映射）
+[33m99963e6[m feat: 完成设备模块前端（设备列表、筛选、分页）和预约模块前端（预约弹窗、我的预约）
+[33md7db1c0[m Merge pull request #3 from Zhangyating1220/feature/equipment-module
+[33mf68e376[m[33m ([m[1;31morigin/feature/equipment-module[m[33m, [m[1;32mfeature/equipment-module[m[33m)[m fix: 根据review意见修复问题（添加全局响应类、JWT拦截、参数校验等）
+[33m4b65e76[m feat: 完成设备模块后端接口（CRUD、分页、筛选）
+[33md8343cb[m[33m ([m[1;32mfeature/login-page[m[33m)[m Merge pull request #2 from Zhangyating1220/feature/login-page
+[33m36f0e32[m[33m ([m[1;31morigin/feature/login-page[m[33m)[m fix: 添加缺失的EquipmentList和BookingDialog组件，修复路由错误
+[33m24f32cf[m feat: 完成前端登录页面与token存储
+[33mc843634[m Merge pull request #1 from Zhangyating1220/feature/user-login
+[33m205eb6e[m[33m ([m[1;31morigin/feature/user-login[m[33m, [m[1;32mfeature/user-login[m[33m)[m fix: 根据review意见修复问题（空值校验、配置化、参数校验等）
+[33mf5df821[m feat: 用户模块登录接口与JWT生成
+[33me8a262e[m chore: 初始化前后端项目骨架
+[33m19ad0bf[m Initial commit
