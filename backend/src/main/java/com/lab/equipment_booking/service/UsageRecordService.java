@@ -16,7 +16,7 @@ public interface UsageRecordService {
     
     UsageRecord findById(Long id);
     
-    List<UsageRecord> findByUserId(String userId);
+    List<UsageRecord> findByUserId(Long userId);
     
     List<UsageRecord> findByEquipmentId(Long equipmentId);
     

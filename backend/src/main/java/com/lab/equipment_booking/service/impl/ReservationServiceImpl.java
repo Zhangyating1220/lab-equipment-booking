@@ -5,10 +5,12 @@ import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.lab.equipment_booking.entity.Equipment;
 import com.lab.equipment_booking.entity.Reservation;
 import com.lab.equipment_booking.entity.User;
+import com.lab.equipment_booking.entity.UsageRecord;
 import com.lab.equipment_booking.mapper.EquipmentMapper;
 import com.lab.equipment_booking.mapper.ReservationMapper;
 import com.lab.equipment_booking.mapper.UserMapper;
 import com.lab.equipment_booking.service.ReservationService;
+import com.lab.equipment_booking.service.UsageRecordService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
 
     @Autowired
     private UserMapper userMapper;
+
+    @Autowired
+    private UsageRecordService usageRecordService;
 
     private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
     private static final DateTimeFormatter TIME_FORMATTER = DateTimeFormatter.ofPattern("HH:mm");
@@ -170,7 +175,38 @@ public class ReservationServiceImpl extends ServiceImpl<ReservationMapper, Reser
         }
         reservation.setStatus(1);
         reservation.setUpdateTime(LocalDateTime.now());
-        return reservationMapper.updateById(reservation) > 0;
+        
+        // 更新预约状态
+        boolean success = reservationMapper.updateById(reservation) > 0;
+        
+        // 如果更新成功，自动创建使用记录
+        if (success) {
+            UsageRecord usageRecord = new UsageRecord();
+            usageRecord.setReservationId(reservation.getId());
+            usageRecord.setEquipmentId(reservation.getEquipmentId());
+            usageRecord.setUserId(reservation.getUserId());
+            usageRecord.setStartTime(reservation.getStartTime());
+            usageRecord.setEndTime(reservation.getEndTime());
+            usageRecord.setStatus(0); // 0: 待使用
+            usageRecord.setCreateTime(LocalDateTime.now());
+            
+            // 获取设备名称
+            Equipment equipment = equipmentMapper.selectById(reservation.getEquipmentId());
+            if (equipment != null) {
+                usageRecord.setEquipmentName(equipment.getName());
+            }
+            
+            // 获取用户名称
+            User user = userMapper.selectById(reservation.getUserId());
+            if (user != null) {
+                usageRecord.setUserName(user.getName());
+            }
+            
+            usageRecordService.createRecord(usageRecord);
+            logger.info("审批通过后创建使用记录: reservationId={}, usageRecord created", id);
+        }
+        
+        return success;
     }
 
     @Override

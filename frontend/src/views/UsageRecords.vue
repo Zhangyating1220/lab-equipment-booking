@@ -75,13 +75,13 @@
         <el-table-column label="操作" width="150">
           <template #default="{ row }">
             <el-button 
-              v-if="row.status === 0" 
+              v-if="Number(row.status) === 0" 
               type="success" 
               size="small" 
               @click="handleStart(row.id)"
             >开始使用</el-button>
             <el-button 
-              v-if="row.status === 1" 
+              v-if="Number(row.status) === 1" 
               type="warning" 
               size="small" 
               @click="handleEnd(row.id)"
@@ -132,12 +132,12 @@ const userCount = computed(() => {
 
 const getStatusText = (status) => {
   const map = { 0: '待使用', 1: '使用中', 2: '已完成', 3: '已超时' }
-  return map[status] || '未知'
+  return map[Number(status)] || '未知'
 }
 
 const getStatusType = (status) => {
   const map = { 0: 'info', 1: 'success', 2: 'primary', 3: 'danger' }
-  return map[status] || ''
+  return map[Number(status)] || ''
 }
 
 const formatMinutes = (minutes) => {
@@ -159,10 +159,16 @@ const getBarWidth = (count) => {
 const loadRecords = async () => {
   loading.value = true
   try {
-    const res = await request.get('/usage/list')
+    const res = await request.get('/usage/list?' + Date.now(), { cache: false })
     // 响应拦截器已提取 data，直接使用即可
     if (Array.isArray(res)) {
-      records.value = res
+      // 使用 JSON.parse(JSON.stringify()) 创建新引用，强制触发响应式更新
+      records.value = JSON.parse(JSON.stringify(res))
+      console.log('加载的使用记录:', res)
+      // 打印每条记录的ID和状态，方便调试
+      res.forEach((record, index) => {
+        console.log(`记录 ${index}: id=${record.id}, status=${record.status}, equipment_name=${record.equipment_name}`)
+      })
     }
   } catch (error) {
     console.error('加载使用记录失败', error)
@@ -196,24 +202,37 @@ const loadStats = async () => {
 
 const handleStart = async (id) => {
   try {
-    await request.post(`/usage/start/${id}`)
+    console.log('开始使用, recordId:', id, '类型:', typeof id)
+    const url = `/usage/start/${id}`
+    console.log('请求URL:', url)
+    const result = await request.post(url)
+    console.log('开始使用结果:', result)
     ElMessage.success('开始使用')
-    loadRecords()
+    // 强制刷新，避免缓存
+    await loadRecords()
   } catch (error) {
     console.error('开始使用失败', error)
-    ElMessage.error('操作失败')
+    console.error('错误详情:', error.response?.data)
+    // 显示具体的错误信息
+    ElMessage.error(error.response?.data?.message || error.message || '操作失败')
   }
 }
 
 const handleEnd = async (id) => {
   try {
-    await request.post(`/usage/end/${id}`)
+    console.log('结束使用, recordId:', id, '类型:', typeof id)
+    const url = `/usage/end/${id}`
+    console.log('请求URL:', url)
+    const result = await request.post(url)
+    console.log('结束使用结果:', result)
     ElMessage.success('使用结束')
-    loadRecords()
+    // 强制刷新，避免缓存
+    await loadRecords()
     loadStats()
   } catch (error) {
     console.error('结束使用失败', error)
-    ElMessage.error('操作失败')
+    console.error('错误详情:', error.response?.data)
+    ElMessage.error(error.response?.data?.message || error.message || '操作失败')
   }
 }
 

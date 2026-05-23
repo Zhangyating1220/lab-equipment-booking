@@ -34,3 +34,17 @@ CREATE TABLE `reservation` (
   `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
   `update_time` DATETIME DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
 );
+
+CREATE TABLE `usage_record` (
+  `id` BIGINT PRIMARY KEY AUTO_INCREMENT,
+  `user_id` BIGINT NOT NULL,
+  `equipment_id` BIGINT NOT NULL,
+  `start_time` DATETIME NOT NULL,
+  `end_time` DATETIME NOT NULL,
+  `actual_start_time` DATETIME,
+  `actual_end_time` DATETIME,
+  `status` TINYINT NOT NULL DEFAULT 0 COMMENT '0-待使用,1-使用中,2-已完成,3-已超时',
+  `create_time` DATETIME DEFAULT CURRENT_TIMESTAMP,
+  FOREIGN KEY (`user_id`) REFERENCES `user`(`id`),
+  FOREIGN KEY (`equipment_id`) REFERENCES `equipment`(`id`)
+);
