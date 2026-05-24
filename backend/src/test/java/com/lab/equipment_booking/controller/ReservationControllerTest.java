@@ -10,6 +10,7 @@ import com.lab.equipment_booking.service.EquipmentService;
 import com.lab.equipment_booking.service.ReservationService;
 import com.lab.equipment_booking.service.UserService;
 import com.lab.equipment_booking.utils.JwtUtil;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -78,6 +79,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("审批预约 - 成功场景")
     void testApproveReservation_Success() throws Exception {
         User user = createTestUser("approve_api_user_001");
         Equipment equipment = createTestEquipment("审批API设备", 0);
@@ -105,6 +107,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("拒绝预约 - 成功场景")
     void testRejectReservation_Success() throws Exception {
         User user = createTestUser("reject_api_user_001");
         Equipment equipment = createTestEquipment("拒绝API设备", 0);
@@ -136,6 +139,7 @@ class ReservationControllerTest {
     }
 
     @Test
+    @DisplayName("取消预约 - 成功场景")
     void testCancelReservation_Success() throws Exception {
         User user = createTestUser("cancel_api_user_001");
         Equipment equipment = createTestEquipment("取消API设备", 0);

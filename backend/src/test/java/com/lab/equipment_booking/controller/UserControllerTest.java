@@ -4,6 +4,7 @@ import com.lab.equipment_booking.entity.User;
 import com.lab.equipment_booking.mapper.UserMapper;
 import com.lab.equipment_booking.service.UserService;
 import com.lab.equipment_booking.utils.JwtUtil;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -51,6 +52,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("用户登录 - 用户不存在")
     void testLogin_UserNotFound() throws Exception {
         mockMvc.perform(post("/api/user/login")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -61,6 +63,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("用户登录 - 密码错误")
     void testLogin_WrongPassword() throws Exception {
         User user = new User();
         user.setUsername("wrongpw001");
@@ -78,6 +81,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("用户注册 - 成功场景")
     void testRegister_Success() throws Exception {
         mockMvc.perform(post("/api/user/register")
                 .contentType(MediaType.APPLICATION_JSON)
@@ -88,6 +92,7 @@ class UserControllerTest {
     }
 
     @Test
+    @DisplayName("用户注册 - 重复用户名")
     void testRegister_DuplicateUsername() throws Exception {
         User user = new User();
         user.setUsername("dup_reg_001");

@@ -9,6 +9,7 @@ import com.lab.equipment_booking.mapper.UserMapper;
 import com.lab.equipment_booking.service.impl.EquipmentServiceImpl;
 import com.lab.equipment_booking.service.impl.ReservationServiceImpl;
 import com.lab.equipment_booking.service.impl.UserServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -67,6 +68,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("创建预约 - 成功场景")
     void testCreateReservation_Success() {
         User user = createTestUser("res_user_001");
         Equipment equipment = createTestEquipment("预约测试设备", 0);
@@ -84,6 +86,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("创建预约 - 设备不可用")
     void testCreateReservation_EquipmentNotAvailable() {
         User user = createTestUser("res_user_002");
         Equipment equipment = createTestEquipment("不可用设备", 1);
@@ -100,6 +103,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("时段冲突检测 - 无冲突")
     void testHasConflict_NoConflict() {
         User user = createTestUser("conflict_user_001");
         Equipment equipment = createTestEquipment("无冲突测试设备", 0);
@@ -112,6 +116,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("审批预约 - 成功场景")
     void testApproveReservation_Success() {
         User user = createTestUser("approve_user_001");
         Equipment equipment = createTestEquipment("审批测试设备", 0);
@@ -133,6 +138,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("审批预约 - 重复审批")
     void testApproveReservation_AlreadyProcessed() {
         User user = createTestUser("approve_user_002");
         Equipment equipment = createTestEquipment("重复审批设备", 0);
@@ -150,6 +156,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("拒绝预约 - 成功场景")
     void testRejectReservation_Success() {
         User user = createTestUser("reject_user_001");
         Equipment equipment = createTestEquipment("拒绝测试设备", 0);
@@ -172,6 +179,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("拒绝预约 - 非待审批状态")
     void testRejectReservation_NotPending() {
         User user = createTestUser("reject_user_002");
         Equipment equipment = createTestEquipment("非待审批设备", 0);
@@ -189,6 +197,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("取消预约 - 成功场景")
     void testCancelReservation_Success() {
         User user = createTestUser("cancel_user_001");
         Equipment equipment = createTestEquipment("取消测试设备", 0);
@@ -209,6 +218,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("取消预约 - 已拒绝状态")
     void testCancelReservation_AlreadyRejected() {
         User user = createTestUser("cancel_user_002");
         Equipment equipment = createTestEquipment("已拒绝设备", 0);
@@ -226,6 +236,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("用户预约列表查询 - 成功场景")
     void testGetUserReservations_Success() {
         User user = createTestUser("list_user_001");
         Equipment equipment = createTestEquipment("列表测试设备", 0);
@@ -246,6 +257,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("待审批预约列表查询 - 成功场景")
     void testGetPendingReservations_Success() {
         User user = createTestUser("pending_user_001");
         Equipment equipment = createTestEquipment("待审批列表设备", 0);
@@ -265,6 +277,7 @@ class ReservationServiceTest {
     }
 
     @Test
+    @DisplayName("可用时段查询 - 成功场景")
     void testGetAvailableSlots_Success() {
         User user = createTestUser("slots_user_001");
         Equipment equipment = createTestEquipment("时段可用设备", 0);

@@ -5,6 +5,7 @@ import com.lab.equipment_booking.dto.EquipmentQueryDTO;
 import com.lab.equipment_booking.entity.Equipment;
 import com.lab.equipment_booking.mapper.EquipmentMapper;
 import com.lab.equipment_booking.service.EquipmentService;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
@@ -31,6 +32,7 @@ class EquipmentControllerTest {
     private EquipmentMapper equipmentMapper;
 
     @Test
+    @DisplayName("设备列表查询 - 成功场景")
     void testListEquipments_Success() throws Exception {
         for (int i = 0; i < 3; i++) {
             Equipment equipment = new Equipment();
@@ -51,6 +53,7 @@ class EquipmentControllerTest {
     }
 
     @Test
+    @DisplayName("设备列表查询 - 按分类筛选")
     void testListEquipments_WithCategoryFilter() throws Exception {
         Equipment equipment1 = new Equipment();
         equipment1.setName("显微镜A");
@@ -73,6 +76,7 @@ class EquipmentControllerTest {
     }
 
     @Test
+    @DisplayName("设备列表查询 - 按状态筛选")
     void testListEquipments_WithStatusFilter() throws Exception {
         Equipment equipment1 = new Equipment();
         equipment1.setName("可用设备");
@@ -95,6 +99,7 @@ class EquipmentControllerTest {
     }
 
     @Test
+    @DisplayName("添加设备 - 成功场景")
     void testAddEquipment_Success() throws Exception {
         String equipmentJson = "{\"name\":\"新增测试设备\",\"category\":\"测试类别\",\"model\":\"NEW-001\",\"location\":\"新位置\",\"status\":0,\"description\":\"测试描述\"}";
 
@@ -106,6 +111,7 @@ class EquipmentControllerTest {
     }
 
     @Test
+    @DisplayName("更新设备 - 成功场景")
     void testUpdateEquipment_Success() throws Exception {
         Equipment equipment = new Equipment();
         equipment.setName("待更新设备");
