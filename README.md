@@ -8,7 +8,7 @@
 |------|------|
 | 后端 | Spring Boot 3.5.14 + MyBatis-Plus 3.5.5 + JWT |
 | 前端 | Vue 3 + Vite + Element Plus + Axios + Vue Router |
-| 数据库 | MySQL 8.x |
+| 数据库 | MySQL 9.7 |
 | 中间件 | Redis（本项目已配置但未使用） |
 
 ## 环境要求
