@@ -1,8 +1,10 @@
 package com.lab.equipment_booking.service;
 
 import com.lab.equipment_booking.entity.User;
+import com.lab.equipment_booking.exception.BusinessException;
 import com.lab.equipment_booking.mapper.UserMapper;
 import com.lab.equipment_booking.service.impl.UserServiceImpl;
+import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -21,6 +23,7 @@ class UserServiceTest {
     private UserMapper userMapper;
 
     @Test
+    @DisplayName("根据用户名查找用户-成功")
     void testFindByUsername_Success() {
         User user = new User();
         user.setUsername("testuser001");
@@ -36,12 +39,14 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("根据用户名查找用户-不存在")
     void testFindByUsername_NotFound() {
         User foundUser = userService.findByUsername("nonexistent");
         assertNull(foundUser);
     }
 
     @Test
+    @DisplayName("用户注册-成功")
     void testRegister_Success() {
         User user = new User();
         user.setUsername("newuser001");
@@ -58,6 +63,7 @@ class UserServiceTest {
     }
 
     @Test
+    @DisplayName("用户注册-用户名重复")
     void testRegister_DuplicateUsername() {
         User user1 = new User();
         user1.setUsername("duplicate001");
@@ -72,10 +78,11 @@ class UserServiceTest {
         user2.setName("用户2");
         user2.setRole(0);
 
-        assertThrows(Exception.class, () -> userService.register(user2));
+        assertThrows(BusinessException.class, () -> userService.register(user2));
     }
 
     @Test
+    @DisplayName("用户注册-密码加密存储")
     void testRegister_PasswordEncrypted() {
         User user = new User();
         user.setUsername("encrypttest");
@@ -88,5 +95,22 @@ class UserServiceTest {
         User registeredUser = userMapper.findByUsername("encrypttest");
         assertNotNull(registeredUser);
         assertNotEquals("plainpassword", registeredUser.getPassword());
+    }
+
+    @Test
+    @DisplayName("用户注册-管理员角色")
+    void testRegister_AdminRole() {
+        User user = new User();
+        user.setUsername("admin001");
+        user.setPassword("adminpass");
+        user.setName("管理员");
+        user.setRole(1);
+
+        boolean result = userService.register(user);
+        assertTrue(result);
+
+        User admin = userMapper.findByUsername("admin001");
+        assertNotNull(admin);
+        assertEquals(1, admin.getRole());
     }
 }
