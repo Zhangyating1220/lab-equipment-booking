@@ -159,3 +159,26 @@ lab-equipment-booking/
 ### 测试报告
 
 所有测试使用 `@Transactional` 注解确保测试隔离性，使用 `@DisplayName` 注解提供友好的测试名称。
+
+## 项目截图
+
+### 登录页面
+![登录页面](doc/images/login.png)
+
+### 用户注册
+![用户注册](doc/images/register.png)
+
+### 设备列表
+![设备列表](doc/images/equipment-list.png)
+
+### 设备管理
+![设备管理](doc/images/equipment-management.png)
+
+### 我的预约
+![我的预约](doc/images/my-reservation.png)
+
+### 审批管理
+![审批管理](doc/images/approval.png)
+
+### 使用记录
+![使用记录](doc/images/usage-record.png)
