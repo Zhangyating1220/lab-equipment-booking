@@ -8,7 +8,7 @@
 |------|------|
 | 后端 | Spring Boot 3.5.14 + MyBatis-Plus 3.5.5 + JWT |
 | 前端 | Vue 3 + Vite + Element Plus + Axios + Vue Router |
-| 数据库 | MySQL 9.7 |
+| 数据库 | MySQL 8.x |
 | 中间件 | Redis（本项目已配置但未使用） |
 
 ## 环境要求
@@ -88,16 +88,45 @@ npm run dev
 lab-equipment-booking/
 ├── backend/                         # 后端代码
 │   ├── src/main/java/               # Java 源代码
-│   ├── src/main/resources/           # 配置文件
-│   └── pom.xml                       # Maven 依赖配置
+│   │   ├── controller/              # 控制器层
+│   │   ├── service/                 # 服务层
+│   │   │   ├── impl/                # 服务实现
+│   │   ├── mapper/                  # 数据访问层
+│   │   ├── entity/                  # 实体类
+│   │   ├── dto/                     # 数据传输对象
+│   │   └── utils/                   # 工具类
+│   ├── src/main/resources/          # 配置文件
+│   │   ├── application.yml          # 应用配置
+│   │   └── mapper/                  # MyBatis XML
+│   ├── src/test/java/               # 测试代码
+│   │   ├── controller/              # 控制器测试
+│   │   └── service/                 # 服务测试
+│   └── pom.xml                      # Maven 依赖配置
 ├── frontend/                        # 前端代码
 │   ├── src/                         # Vue 源代码
-│   ├── package.json                  # npm 依赖配置
-│   └── vite.config.js                # Vite 构建配置
+│   │   ├── views/                   # 页面组件
+│   │   ├── components/              # 通用组件
+│   │   ├── router/                  # 路由配置
+│   │   ├── utils/                   # 工具函数
+│   │   └── assets/                  # 静态资源
+│   ├── package.json                 # npm 依赖配置
+│   └── vite.config.js               # Vite 构建配置
 ├── doc/                             # 文档目录
-│   └── sql/                         # 数据库脚本
+│   ├── sql/                         # 数据库脚本
+│   │   ├── schema.sql               # 建表脚本
+│   │   └── data.sql                 # 测试数据
+│   └── images/                      # 项目截图
 └── README.md                        # 项目说明文档
 ```
+
+## 数据库表
+
+| 表名 | 说明 |
+|------|------|
+| user | 用户表（包含学生和管理员） |
+| equipment | 设备信息表 |
+| reservation | 预约记录表 |
+| usage_record | 设备使用记录表 |
 
 ## 功能模块
 
@@ -115,3 +144,18 @@ lab-equipment-booking/
 - 测试账号密码默认为 **123456**
 
 > **注意**：启动后端前请确保 MySQL 服务已运行
+
+## 集成测试
+
+### 测试覆盖
+
+- **服务层测试**：UserServiceTest, EquipmentServiceTest, ReservationServiceTest
+- **控制器层测试**：UserControllerTest, EquipmentControllerTest, ReservationControllerTest
+
+### 运行测试
+
+在 IDE 中直接运行测试类即可。
+
+### 测试报告
+
+所有测试使用 `@Transactional` 注解确保测试隔离性，使用 `@DisplayName` 注解提供友好的测试名称。
